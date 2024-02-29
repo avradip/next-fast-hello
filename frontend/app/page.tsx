@@ -61,7 +61,6 @@ export default function Home() {
 
 import { useState } from 'react';
 import { FaArrowRight  } from 'react-icons/fa';
-import Head from 'next/head';
 
 export default function Home() {
   const [inputValue, setInputValue] = useState('');
@@ -79,20 +78,25 @@ export default function Home() {
     setLoading(true);
 
     try {
-      const apiUrl = process.env.NEXT_PUBLIC_CHAT_API + "/hello/";
-      const response = await fetch(`${apiUrl}`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ input: inputValue }),
-      });
-
+      const apiUrl = process.env.NEXT_PUBLIC_BACKEND_API;
+      let response;
+      if (inputValue === '') {
+        response = await fetch(`${apiUrl}/hello/`);
+      }
+      else {
+        response = await fetch(`${apiUrl}/process/`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ input: inputValue }),
+        });
+      }
       const data = await response.json();
       setOutput(data.output);
     } catch (error) {
       console.error('Error:', error);
-      await new Promise(resolve => setTimeout(resolve, 5000));
+      //await new Promise(resolve => setTimeout(resolve, 1000));
       setOutput('An error occurred with input: ' + inputValue);
     } finally {
       setLoading(false);
